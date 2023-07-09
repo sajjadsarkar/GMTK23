@@ -11,11 +11,8 @@ public class Shot : MonoBehaviour
     public GameObject bullet;
 
     public Transform bulletPos;
-
+    
     public Animator animator;
-    public string ShotAnime;
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -32,15 +29,24 @@ public class Shot : MonoBehaviour
         {
             if (Bullet.bullet.isDestroyed)
             {
-                Invoke("BulletInst", 0.5f);
-                animator.SetBool(ShotAnime, true);
+                Invoke("AnimationEnable", 0.2f);
+                Invoke("BulletInst", 0.3f);
             }
         }
    
     }
 
+    void AnimationEnable()
+    {
+        animator.enabled = true;
+    }
+    void AnimationDisable()
+    {
+        animator.enabled = false;
+    }
     public void BulletInst()
     {
         Instantiate(bullet, bulletPos.transform.position, bulletPos.transform.rotation);
+        Invoke("AnimationDisable" , 1f);
     }
 }
