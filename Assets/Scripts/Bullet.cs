@@ -2,19 +2,29 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public static Bullet bullet { get; private set; }
+
     public float bulletSpeed = 10f;
     public float bulletSpeedAuto = 10f;
     public float destroyDelay = 10f;
     public int scoreValue = 10;
 
     private bool canMove = true;
-    private bool isDestroyed = false;
+    public bool isDestroyed = false;
 
     private Rigidbody rb;
     public float minX = -10f; // Minimum X coordinate limit
     public float maxX = 10f;  // Maximum X coordinate limit
     public float minY = -10f; // Minimum Y coordinate limit
-    public float maxY = 10f;  // Maximum Y coordinate limit
+    public float maxY = 10f;  // Maximum Y coordinate limit\
+
+    void Awake()
+    {
+        if (bullet == null)
+            bullet = this;
+        else
+            Destroy(gameObject);
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -50,8 +60,9 @@ public class Bullet : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") && !isDestroyed)
+        if (other.CompareTag("Target") && !isDestroyed)
         {
+          
             // Increase score and destroy enemy
             GameManager.Instance.AddScore(scoreValue);
             Destroy(other.gameObject);
@@ -59,9 +70,7 @@ public class Bullet : MonoBehaviour
             // Prevent bullet from hitting multiple enemies
             isDestroyed = true;
             rb.velocity = Vector3.zero;
-
-            // Destroy bullet after hitting an enemy
-            Destroy(gameObject, 0.1f);
+          Destroy(gameObject, 0.1f);
         }
     }
 
