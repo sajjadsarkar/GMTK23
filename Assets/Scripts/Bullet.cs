@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Bullet : MonoBehaviour
 {
@@ -17,9 +18,13 @@ public class Bullet : MonoBehaviour
     public float maxX = 10f;  // Maximum X coordinate limit
     public float minY = -10f; // Minimum Y coordinate limit
     public float maxY = 10f;  // Maximum Y coordinate limit\
+    private ObjectSpawner objectSpawner;
+
+    public ParticleSystem particlePrefab;
 
     void Awake()
     {
+        objectSpawner = FindObjectOfType<ObjectSpawner>();
         if (bullet == null)
             bullet = this;
         else
@@ -56,24 +61,43 @@ public class Bullet : MonoBehaviour
             Vector3 movement = new Vector3(moveX, moveY, 0);
             rb.velocity = movement.normalized * bulletSpeed;
         }
+       
     }
 
     void OnTriggerEnter(Collider other)
     {
+
+        if (other.CompareTag("Enemy"))
+        {
+            SceneManager.LoadScene(0);
+            Destroy(gameObject, 0.1f);
+            Time.timeScale = 0f;
+        }
         if (other.CompareTag("Target") && !isDestroyed)
         {
-          
+            ParticleSystem particleSystem = Instantiate(particlePrefab);
+
+            // Set the position and rotation of the instantiated particle system
+            particleSystem.transform.position = transform.position;
+            particleSystem.transform.rotation = transform.rotation;
+
+            // Play the particle system
+            particleSystem.Play();
             // Increase score and destroy enemy
             GameManager.Instance.AddScore(scoreValue);
             Destroy(other.gameObject);
-
             // Prevent bullet from hitting multiple enemies
             isDestroyed = true;
             rb.velocity = Vector3.zero;
           Destroy(gameObject, 0.1f);
+          Destroy(particleSystem.gameObject, 1f);
+            if (objectSpawner != null)
+            {
+                objectSpawner.ObjectDestroyed();
+            }
         }
     }
-
+  
     public void StopMovement()
     {
         canMove = false;

@@ -13,11 +13,15 @@ public class Shot : MonoBehaviour
     public Transform bulletPos;
     
     public Animator animator;
+
+    public AudioSource audioSource;
+    public ParticleSystem particlePrefab;
     // Start is called before the first frame update
     void Start()
     {
         /*        Camera1.enabled = true;
                 Camera2.enabled = false;*/
+
         Invoke("BulletInst", 0.2f);
     }
 
@@ -31,9 +35,10 @@ public class Shot : MonoBehaviour
             {
                 Invoke("AnimationEnable", 0.2f);
                 Invoke("BulletInst", 0.3f);
+
             }
         }
-   
+        
     }
 
     void AnimationEnable()
@@ -43,10 +48,22 @@ public class Shot : MonoBehaviour
     void AnimationDisable()
     {
         animator.enabled = false;
+        audioSource.enabled = false;
     }
     public void BulletInst()
     {
+
+        ParticleSystem particleSystem = Instantiate(particlePrefab);
+
+        // Set the position and rotation of the instantiated particle system
+        particleSystem.transform.position = bulletPos.transform.position;
+        particleSystem.transform.rotation = bulletPos.transform.rotation;
+
+        // Play the particle system
+        particleSystem.Play();
+        audioSource.enabled = true;
         Instantiate(bullet, bulletPos.transform.position, bulletPos.transform.rotation);
         Invoke("AnimationDisable" , 1f);
+       
     }
 }
